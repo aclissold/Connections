@@ -30,6 +30,8 @@ from random import randint
 # Initialize board to empty cells
 board = [[[] for i in range(7)] for i in range(7)]
 turn = randint(1, 2)
+last_row = 0
+last_column = 0
 
 # Set each board cell to a space
 def reset_board():
@@ -58,12 +60,15 @@ def prompt_column():
     return column
 
 def drop_piece(column):
+    global last_row, last_column
     for row in range(7):
         if board[row][column] == ' ':
             if turn == 1:
                 board[row][column] = 'x'
+                last_row, last_column = row, column
             elif turn == 2:
                 board[row][column] = 'o'
+                last_row, last_column = row, column
             else:
                 print('Error dropping piece (turn not 1 or 2)')
             break
@@ -71,6 +76,7 @@ def drop_piece(column):
             print('Row is full and I didn\'t implement this case yet.')
 
 def check_drop():
+    print("Last row:", last_row, "Last column:", last_column)
     draw_board()
 
 # Calls the other functions
