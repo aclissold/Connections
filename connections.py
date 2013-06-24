@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
 # Required methods:
 #
@@ -7,9 +7,15 @@
 # draw_board()
 # prompt_column()
 # drop_piece()
-# check_drop()
+# has_four_in_a_row()
 # change_turn()
 # again()
+#
+# To-do:
+#   Figure out why it put two pieces
+#   Allow winning vertically
+#   Allow winning diagonally
+#   Restart when the board is filled
 #
 # Sample:
 #
@@ -25,6 +31,7 @@
 #   1 2 3 4 5 6 7
 #
 # Choose a column: 4
+import sys
 from random import randint
 
 # Initialize board to empty cells
@@ -43,6 +50,7 @@ def reset_board():
 # in a pretty format.
 def draw_board():
     print()
+    print(' ~Player {0}\'s Turn~'.format(turn))
     print('   _____________')
     print('  |' + str(board[6][0]), board[6][1], board[6][2], board[6][3], board[6][4], board[6][5], str(board[5][6]) + '|')
     print('  |' + str(board[5][0]), board[5][1], board[5][2], board[5][3], board[5][4], board[5][5], str(board[5][6]) + '|')
@@ -56,7 +64,14 @@ def draw_board():
     print()
 
 def prompt_column():
-    column = int(input("Choose a column: ")) - 1
+    column = -1
+    while column < 0 or column > 6:
+        try:
+            column = int(input("Choose a column: ")) - 1
+        except ValueError:
+            pass
+        if column < 0 or column > 6:
+            print("Please enter a number from 1 - 7 (inclusive).")
     return column
 
 def drop_piece(column):
@@ -66,27 +81,72 @@ def drop_piece(column):
             if turn == 1:
                 board[row][column] = 'x'
                 last_row, last_column = row, column
+                break
             elif turn == 2:
                 board[row][column] = 'o'
                 last_row, last_column = row, column
+                break
             else:
-                print('Error dropping piece (turn not 1 or 2)')
-            break
+                raise Exception("You somehow managed to make it neither X " \
+                                "nor O's turn.")
+        elif board[row][column] == 'x' or board[row][column] == 'o':
+            # Check the next row up
+            pass
         else:
-            print('Row is full and I didn\'t implement this case yet.')
+            raise Exception("That row/column combination was not empty")
 
-def check_drop():
-    print("Last row:", last_row, "Last column:", last_column)
-    draw_board()
+def change_turn():
+    global turn
+    if turn == 1:
+        turn = 2
+    else:
+        turn = 1
+
+def has_four_in_a_row():
+    dropped_piece = board[last_row][last_column]
+    if dropped_piece == 'x' or dropped_piece == 'o':
+        in_a_row = 0
+        # Check if there's four-in-a-row horizontally
+        for i in range(4):
+            if last_column - i >= 0:
+                if board[last_row][last_column - i] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        for i in range(4):
+            if last_column + 1 <= 6:
+                if board[last_row][last_column + 1] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        if in_a_row == 4:
+            print("Four in a row!!! Player {0} wins!!! " \
+                  "Party time.".format(turn))
+            return True
+        return False
+    else:
+        return False
 
 # Calls the other functions
 def play():
     reset_board()
     draw_board()
-    column = prompt_column()
-    drop_piece(column)
-    check_drop()
+    while(not has_four_in_a_row()):
+        column = prompt_column()
+        drop_piece(column)
+        change_turn()
+        draw_board()
 
 if __name__ == '__main__':
-    play()
+    req_version = (3,0)
+    cur_version = sys.version_info
+
+    if cur_version >= req_version:
+        play()
+    else:
+        print("Connections requires Python 3 to run.")
 
