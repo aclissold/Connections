@@ -35,7 +35,7 @@ import sys
 from random import randint
 
 # Initialize board to empty cells
-board = [[[] for i in range(7)] for i in range(7)]
+board = [[[] for index in range(7)] for index in range(7)]
 turn = randint(1, 2)
 last_row = 0
 last_column = 0
