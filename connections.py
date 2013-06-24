@@ -93,7 +93,11 @@ def drop_piece(column):
             # Check the next row up
             pass
         else:
-            raise Exception("That row/column combination was not empty")
+            raise Exception("Attempted to set a nonempty row/column combination")
+    else:
+        # Column was full
+        new_column = int(input("Column is full, please choose another: ")) - 1
+        drop_piece(new_column)
 
 def change_turn():
     global turn
