@@ -30,7 +30,7 @@
 #   1 2 3 4 5 6 7
 #
 # Choose a column: 4
-import sys
+import os, sys
 from random import randint
 
 # Initialize board to empty cells
@@ -48,6 +48,7 @@ def reset_board():
 # Display the current board state to the user,
 # in a pretty format.
 def draw_board():
+    os.system('clear')
     print()
     print(' ~Player {0}\'s Turn~'.format(turn))
     print('   _____________')
