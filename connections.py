@@ -13,7 +13,6 @@
 #
 # To-do:
 #   Figure out why it put two pieces
-#   Allow winning vertically
 #   Allow winning diagonally
 #   Restart when the board is filled
 #
@@ -131,6 +130,7 @@ def has_four_in_a_row():
         if in_a_row == 4:
             print("Four in a row!!! Player {0} wins!!! " \
                   "Party time.".format(turn))
+            print()
             has_four_in_a_row = True
         # Check if there's four-in-a-row vertically
         in_a_row = 1
@@ -153,8 +153,25 @@ def has_four_in_a_row():
         if in_a_row == 4:
             print("Four in a row!!! Player {0} wins!!! " \
                   "Party time.".format(turn))
+            print()
             has_four_in_a_row = True
     return has_four_in_a_row
+
+def again():
+    while True:
+        choice = str(input("Play again? (Y/n): ").lower().split())
+        if len(choice) == 2:
+            play()
+        else:
+            if choice[2] == 'y':
+                play()
+            elif choice[2] == 'n':
+                print("Thanks for playing!")
+                print()
+                break
+            else:
+                print("Please type a \"y\" (or hit enter) for yes, " \
+                      "or an \"n\" for no.")
 
 # Calls the other functions
 def play():
@@ -165,6 +182,7 @@ def play():
         drop_piece(column)
         change_turn()
         draw_board()
+    again()
 
 if __name__ == '__main__':
     req_version = (3,0)
