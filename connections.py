@@ -62,11 +62,15 @@ def draw_board():
     print('   1 2 3 4 5 6 7')
     print()
 
-def prompt_column():
+def prompt_column(is_full=False):
+    if is_full:
+        message = "Column is full, please choose another: "
+    else:
+        message = "Choose a column: "
     column = -1
     while column < 0 or column > 6:
         try:
-            column = int(input("Choose a column: ")) - 1
+            column = int(input(message)) - 1
         except ValueError:
             pass
         if column < 0 or column > 6:
@@ -94,8 +98,8 @@ def drop_piece(column):
         else:
             raise Exception("Attempted to set a nonempty row/column combination")
     else:
-        # Column was full
-        new_column = int(input("Column is full, please choose another: ")) - 1
+        # Column is full
+        new_column = prompt_column(is_full=True)
         drop_piece(new_column)
 
 def change_turn():
@@ -145,6 +149,54 @@ def has_four_in_a_row():
         for i in range(1, 5):
             if last_row - i >= 0:
                 if board[last_row - i][last_column] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        if in_a_row == 4:
+            winner = 2 if turn == 1 else 2
+            print("Four in a row!!! Player {0} wins!!! " \
+                  "Party time.".format(winner))
+            print()
+            has_four_in_a_row = True
+        # Check if there's four-in-a-row diagonally (/)
+        in_a_row = 1
+        for i in range(1, 5):
+            if last_row + i <= 6 and last_column + i <= 6:
+                if board[last_row + i][last_column + i] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        for i in range(1, 5):
+            if last_row - i >= 0 and last_column - i >= 0:
+                if board[last_row - i][last_column - i] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        if in_a_row == 4:
+            winner = 2 if turn == 1 else 2
+            print("Four in a row!!! Player {0} wins!!! " \
+                  "Party time.".format(winner))
+            print()
+            has_four_in_a_row = True
+        # Check if there's four-in-a-row diagonally (\)
+        in_a_row = 1
+        for i in range(1, 5):
+            if last_row - i >= 0 and last_column + i <= 6:
+                if board[last_row - i][last_column + i] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        for i in range(1, 5):
+            if last_row + i <= 6 and last_column - i >= 0:
+                if board[last_row + i][last_column - i] == dropped_piece:
                     in_a_row += 1
                 else:
                     break
