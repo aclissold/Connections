@@ -168,7 +168,7 @@ def again():
             elif choice[2] == 'n':
                 print("Thanks for playing!")
                 print()
-                break
+                sys.exit(0)
             else:
                 print("Please type a \"y\" (or hit enter) for yes, " \
                       "or an \"n\" for no.")
