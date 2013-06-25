@@ -86,18 +86,10 @@ def drop_piece(column):
                 board[row][column] = 'x'
                 last_row, last_column = row, column
                 break
-            elif turn == 2:
+            else:
                 board[row][column] = 'o'
                 last_row, last_column = row, column
                 break
-            else:
-                raise Exception("You somehow managed to make it neither X " \
-                                "nor O's turn.")
-        elif board[row][column] == 'x' or board[row][column] == 'o':
-            # Check the next row up
-            pass
-        else:
-            raise Exception("Attempted to set a nonempty row/column combination")
     else:
         # Column is full
         new_column = prompt_column(is_full=True)
