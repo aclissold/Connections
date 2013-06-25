@@ -108,10 +108,11 @@ def change_turn():
 
 def has_four_in_a_row():
     dropped_piece = board[last_row][last_column]
+    has_four_in_a_row = False
     if dropped_piece == 'x' or dropped_piece == 'o':
-        in_a_row = 0
         # Check if there's four-in-a-row horizontally
-        for i in range(4):
+        in_a_row = 1
+        for i in range(1, 5):
             if last_column - i >= 0:
                 if board[last_row][last_column - i] == dropped_piece:
                     in_a_row += 1
@@ -119,9 +120,9 @@ def has_four_in_a_row():
                     break
             else:
                 break
-        for i in range(4):
-            if last_column + 1 <= 6:
-                if board[last_row][last_column + 1] == dropped_piece:
+        for i in range(1, 5):
+            if last_column + i <= 6:
+                if board[last_row][last_column + i] == dropped_piece:
                     in_a_row += 1
                 else:
                     break
@@ -130,10 +131,30 @@ def has_four_in_a_row():
         if in_a_row == 4:
             print("Four in a row!!! Player {0} wins!!! " \
                   "Party time.".format(turn))
-            return True
-        return False
-    else:
-        return False
+            has_four_in_a_row = True
+        # Check if there's four-in-a-row vertically
+        in_a_row = 1
+        for i in range(1, 5):
+            if last_row + i <= 6:
+                if board[last_row + i][last_column] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        for i in range(1, 5):
+            if last_row - i >= 0:
+                if board[last_row - i][last_column] == dropped_piece:
+                    in_a_row += 1
+                else:
+                    break
+            else:
+                break
+        if in_a_row == 4:
+            print("Four in a row!!! Player {0} wins!!! " \
+                  "Party time.".format(turn))
+            has_four_in_a_row = True
+    return has_four_in_a_row
 
 # Calls the other functions
 def play():
