@@ -151,8 +151,9 @@ def has_four_in_a_row():
             else:
                 break
         if in_a_row == 4:
+            winner = 2 if turn == 1 else 2
             print("Four in a row!!! Player {0} wins!!! " \
-                  "Party time.".format(turn))
+                  "Party time.".format(winner))
             print()
             has_four_in_a_row = True
     return has_four_in_a_row
