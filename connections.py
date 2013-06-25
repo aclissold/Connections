@@ -1,35 +1,11 @@
 #!/usr/bin/env python3
 #
-# Required methods:
-#
-# play()
-# reset_board()
-# draw_board()
-# prompt_column()
-# drop_piece()
-# has_four_in_a_row()
-# change_turn()
-# again()
+# A simple command-line Connect Four clone.
 #
 # To-do:
-#   Allow winning diagonally
-#   Restart when the board is filled
 #   Don't show turn info on win
-#
-# Sample:
-#
-# ~Player 1's Turn~
-#   _____________
-#  |             |
-#  |        x o  |
-#  |    x   o x  |
-#  |o   o x o o  |
-#  |x x o x x x o|
-#  |o o x o x x o|
-# /===============\
-#   1 2 3 4 5 6 7
-#
-# Choose a column: 4
+#   Colorize winning pieces
+#   Add comments/docstrings
 import os, sys
 from random import randint
 
@@ -101,6 +77,19 @@ def change_turn():
         turn = 2
     else:
         turn = 1
+
+def top_row_full():
+    pieces_in_row = 0
+    for i in range(7):
+        if board[6][i] == ' ':
+            break
+        else:
+            pieces_in_row += 1
+    if pieces_in_row == 7:
+        print("IT'S A DRAW?!? Nobody wins! Sad day.")
+        return True
+    else:
+        return False
 
 def has_four_in_a_row():
     dropped_piece = board[last_row][last_column]
@@ -223,7 +212,7 @@ def again():
 def play():
     reset_board()
     draw_board()
-    while(not has_four_in_a_row()):
+    while(not has_four_in_a_row() and not top_row_full()):
         column = prompt_column()
         drop_piece(column)
         change_turn()
