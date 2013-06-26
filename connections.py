@@ -5,8 +5,8 @@
 # To-do:
 #   Don't show turn info on win
 #   Colorize winning pieces
+#       green: \033[38;5;46m or 118m normal: \033[0m
 #   Add comments/docstrings
-#   Convert all " strings to 's
 import os, sys
 from random import randint
 
@@ -27,7 +27,7 @@ def reset_board():
 def draw_board():
     os.system('clear')
     print()
-    print(' ~Player {0}\'s Turn~'.format(turn))
+    print('~Player {0}\'s Turn~'.format(turn))
     print('   _____________')
     print('  |' + str(board[6][0]), board[6][1], board[6][2], board[6][3], board[6][4], board[6][5], str(board[6][6]) + '|')
     print('  |' + str(board[5][0]), board[5][1], board[5][2], board[5][3], board[5][4], board[5][5], str(board[5][6]) + '|')
@@ -42,9 +42,9 @@ def draw_board():
 
 def prompt_column(is_full=False):
     if is_full:
-        message = "Column is full, please choose another: "
+        message = 'Column is full, please choose another: '
     else:
-        message = "Choose a column (or type q to quit): "
+        message = 'Choose a column (or type q to quit): '
     column = -1
     while column < 0 or column > 6:
         inputed_string = input(message)
@@ -57,7 +57,7 @@ def prompt_column(is_full=False):
         except ValueError:
             pass
         if column < 0 or column > 6:
-            print("Please enter a number from 1 - 7 or \"q\".")
+            print('Please enter a number from 1 - 7 or \"q\".')
     return column
 
 def drop_piece(column):
@@ -92,7 +92,7 @@ def top_row_full():
         else:
             pieces_in_row += 1
     if pieces_in_row == 7:
-        print("IT'S A DRAW?!? Nobody wins! Sad day.")
+        print('IT\'S A DRAW?!? Nobody wins! Sad day.')
         return True
     else:
         return False
@@ -120,8 +120,8 @@ def has_four_in_a_row():
             else:
                 break
         if in_a_row == 4:
-            print("Four in a row!!! Player {0} wins!!! " \
-                  "Party time.".format(turn))
+            print('Four in a row!!! Player {0} wins!!! ' \
+                  'Party time.'.format(turn))
             print()
             has_four_in_a_row = True
         # Check if there's four-in-a-row vertically
@@ -144,8 +144,8 @@ def has_four_in_a_row():
                 break
         if in_a_row == 4:
             winner = 2 if turn == 1 else 2
-            print("Four in a row!!! Player {0} wins!!! " \
-                  "Party time.".format(winner))
+            print('Four in a row!!! Player {0} wins!!! ' \
+                  'Party time.'.format(winner))
             print()
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (/)
@@ -168,8 +168,8 @@ def has_four_in_a_row():
                 break
         if in_a_row == 4:
             winner = 2 if turn == 1 else 2
-            print("Four in a row!!! Player {0} wins!!! " \
-                  "Party time.".format(winner))
+            print('Four in a row!!! Player {0} wins!!! ' \
+                  'Party time.'.format(winner))
             print()
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (\)
@@ -192,27 +192,27 @@ def has_four_in_a_row():
                 break
         if in_a_row == 4:
             winner = 2 if turn == 1 else 2
-            print("Four in a row!!! Player {0} wins!!! " \
-                  "Party time.".format(winner))
+            print('Four in a row!!! Player {0} wins!!! ' \
+                  'Party time.'.format(winner))
             print()
             has_four_in_a_row = True
     return has_four_in_a_row
 
 def again():
     while True:
-        choice = str(input("Play again? (Y/n): ").lower().split())
+        choice = str(input('Play again? (Y/n): ').lower().split())
         if len(choice) == 2:
             play()
         else:
             if choice[2] == 'y':
                 play()
             elif choice[2] == 'n':
-                print("Thanks for playing!")
+                print('Thanks for playing!')
                 print()
                 sys.exit(0)
             else:
-                print("Please type a \"y\" (or hit enter) for yes, " \
-                      "or an \"n\" for no.")
+                print('Please type a \"y\" (or hit enter) for yes, ' \
+                      'or an \"n\" for no.')
 
 # Calls the other functions
 def play():
@@ -232,5 +232,5 @@ if __name__ == '__main__':
     if cur_version >= req_version:
         play()
     else:
-        print("Connections requires Python 3 to run.")
+        print('Connections requires Python 3 to run.')
 
