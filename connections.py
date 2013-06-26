@@ -27,7 +27,7 @@ def reset_board():
 def draw_board():
     os.system('clear')
     print()
-    print('~Player {0}\'s Turn~'.format(turn))
+    print(' ~Player {0}\'s Turn~'.format(turn))
     print('   _____________')
     print('  |' + str(board[6][0]), board[6][1], board[6][2], board[6][3], board[6][4], board[6][5], str(board[6][6]) + '|')
     print('  |' + str(board[5][0]), board[5][1], board[5][2], board[5][3], board[5][4], board[5][5], str(board[5][6]) + '|')
@@ -120,9 +120,6 @@ def has_four_in_a_row():
             else:
                 break
         if in_a_row == 4:
-            print('Four in a row!!! Player {0} wins!!! ' \
-                  'Party time.'.format(turn))
-            print()
             has_four_in_a_row = True
         # Check if there's four-in-a-row vertically
         in_a_row = 1
@@ -143,10 +140,6 @@ def has_four_in_a_row():
             else:
                 break
         if in_a_row == 4:
-            winner = 2 if turn == 1 else 2
-            print('Four in a row!!! Player {0} wins!!! ' \
-                  'Party time.'.format(winner))
-            print()
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (/)
         in_a_row = 1
@@ -167,10 +160,6 @@ def has_four_in_a_row():
             else:
                 break
         if in_a_row == 4:
-            winner = 2 if turn == 1 else 2
-            print('Four in a row!!! Player {0} wins!!! ' \
-                  'Party time.'.format(winner))
-            print()
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (\)
         in_a_row = 1
@@ -191,12 +180,28 @@ def has_four_in_a_row():
             else:
                 break
         if in_a_row == 4:
-            winner = 2 if turn == 1 else 2
-            print('Four in a row!!! Player {0} wins!!! ' \
-                  'Party time.'.format(winner))
-            print()
             has_four_in_a_row = True
     return has_four_in_a_row
+
+def win():
+    os.system('clear')
+    print()
+    print(' ~DING DING DING!~'.format(turn))
+    print('   _____________')
+    print('  |' + str(board[6][0]), board[6][1], board[6][2], board[6][3], board[6][4], board[6][5], str(board[6][6]) + '|')
+    print('  |' + str(board[5][0]), board[5][1], board[5][2], board[5][3], board[5][4], board[5][5], str(board[5][6]) + '|')
+    print('  |' + str(board[4][0]), board[4][1], board[4][2], board[4][3], board[4][4], board[4][5], str(board[4][6]) + '|')
+    print('  |' + str(board[3][0]), board[3][1], board[3][2], board[3][3], board[3][4], board[3][5], str(board[3][6]) + '|')
+    print('  |' + str(board[2][0]), board[2][1], board[2][2], board[2][3], board[2][4], board[2][5], str(board[2][6]) + '|')
+    print('  |' + str(board[1][0]), board[1][1], board[1][2], board[1][3], board[1][4], board[1][5], str(board[1][6]) + '|')
+    print('  |' + str(board[0][0]), board[0][1], board[0][2], board[0][3], board[0][4], board[0][5], str(board[0][6]) + '|')
+    print(' /===============\\')
+    print('   1 2 3 4 5 6 7')
+    print()
+    winner = 2 if turn == 1 else 2
+    print('Four in a row!!! Player {0} wins!!! ' \
+          'Party time.'.format(winner))
+    print()
 
 def again():
     while True:
@@ -218,11 +223,18 @@ def again():
 def play():
     reset_board()
     draw_board()
-    while(not has_four_in_a_row() and not top_row_full()):
+    has_four = False
+    full = False
+    while(not has_four and not full):
         column = prompt_column()
         drop_piece(column)
         change_turn()
-        draw_board()
+        full = top_row_full()
+        has_four = has_four_in_a_row()
+        if has_four:
+            win()
+        else:
+            draw_board()
     again()
 
 if __name__ == '__main__':
