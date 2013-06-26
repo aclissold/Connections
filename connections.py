@@ -12,6 +12,8 @@ from random import randint
 
 # Initialize board to empty cells
 board = [[[] for index in range(7)] for index in range(7)]
+winning_rows = [0, 0, 0, 0]
+winning_columns = [0, 0, 0, 0]
 turn = randint(1, 2)
 last_row = 0
 last_column = 0
@@ -102,11 +104,17 @@ def has_four_in_a_row():
     has_four_in_a_row = False
     if dropped_piece == 'x' or dropped_piece == 'o':
         # Check if there's four-in-a-row horizontally
+        count = 1 # Solely used for winning_rows and columns
+        winning_rows[0] = last_row
+        winning_columns[0] = last_column
         in_a_row = 1
         for i in range(1, 5):
             if last_column - i >= 0:
                 if board[last_row][last_column - i] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row
+                    winning_columns[count] = last_column - i
+                    count += 1
                 else:
                     break
             else:
@@ -115,6 +123,9 @@ def has_four_in_a_row():
             if last_column + i <= 6:
                 if board[last_row][last_column + i] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row
+                    winning_columns[count] = last_column + i
+                    count += 1
                 else:
                     break
             else:
@@ -122,11 +133,15 @@ def has_four_in_a_row():
         if in_a_row == 4:
             has_four_in_a_row = True
         # Check if there's four-in-a-row vertically
+        count = 1
         in_a_row = 1
         for i in range(1, 5):
             if last_row + i <= 6:
                 if board[last_row + i][last_column] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row + i
+                    winning_columns[count] = last_column
+                    count += 1
                 else:
                     break
             else:
@@ -135,6 +150,9 @@ def has_four_in_a_row():
             if last_row - i >= 0:
                 if board[last_row - i][last_column] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row - i
+                    winning_columns[count] = last_column
+                    count += 1
                 else:
                     break
             else:
@@ -142,11 +160,15 @@ def has_four_in_a_row():
         if in_a_row == 4:
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (/)
+        count = 1
         in_a_row = 1
         for i in range(1, 5):
             if last_row + i <= 6 and last_column + i <= 6:
                 if board[last_row + i][last_column + i] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row + i
+                    winning_columns[count] = last_column + i
+                    count += 1
                 else:
                     break
             else:
@@ -155,6 +177,9 @@ def has_four_in_a_row():
             if last_row - i >= 0 and last_column - i >= 0:
                 if board[last_row - i][last_column - i] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row - i
+                    winning_columns[count] = last_column - i
+                    count += 1
                 else:
                     break
             else:
@@ -162,6 +187,7 @@ def has_four_in_a_row():
         if in_a_row == 4:
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (\)
+        count = 1
         in_a_row = 1
         for i in range(1, 5):
             if last_row - i >= 0 and last_column + i <= 6:
@@ -185,6 +211,10 @@ def has_four_in_a_row():
 
 def win():
     os.system('clear')
+    # Change colors of the winning pieces
+    for i in range(4):
+        board[winning_rows[i]][winning_columns[i]] = '*'
+    # Basically draw_board()
     print()
     print(' ~DING DING DING!~'.format(turn))
     print('   _____________')
