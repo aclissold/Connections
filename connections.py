@@ -6,6 +6,7 @@
 #   Don't show turn info on win
 #   Colorize winning pieces
 #   Add comments/docstrings
+#   Convert all " strings to 's
 import os, sys
 from random import randint
 
@@ -43,15 +44,20 @@ def prompt_column(is_full=False):
     if is_full:
         message = "Column is full, please choose another: "
     else:
-        message = "Choose a column: "
+        message = "Choose a column (or type q to quit): "
     column = -1
     while column < 0 or column > 6:
+        inputed_string = input(message)
+        modified_input = str(inputed_string).lower().split()
+        if modified_input:
+            if modified_input[0] == 'q' or modified_input[0] == 'quit':
+                sys.exit(0)
         try:
-            column = int(input(message)) - 1
+            column = int(inputed_string) - 1
         except ValueError:
             pass
         if column < 0 or column > 6:
-            print("Please enter a number from 1 - 7 (inclusive).")
+            print("Please enter a number from 1 - 7 or \"q\".")
     return column
 
 def drop_piece(column):
