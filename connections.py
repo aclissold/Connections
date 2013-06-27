@@ -4,8 +4,7 @@
 #
 # To-do:
 #   Allow winning of five+ in a row
-#   Colorize winning pieces
-#       green: \033[38;5;46m or 118m normal: \033[0m
+#   Colorize winning pieces on Windows
 #   Add comments/docstrings
 import os, sys
 from random import randint
@@ -218,8 +217,10 @@ def has_four_in_a_row():
 def win():
     os.system('clear')
     # Change colors of the winning pieces
+    piece = 'x' if turn == 2 else 'o'
+    piece = '\033[38;5;118m' + piece + '\033[0m'
     for i in range(4):
-        board[winning_rows[i]][winning_columns[i]] = '*'
+        board[winning_rows[i]][winning_columns[i]] = piece
     # Basically draw_board()
     print()
     print(' ~DING DING DING!~'.format(turn))
