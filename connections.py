@@ -11,8 +11,8 @@ from random import randint
 
 # Initialize board to empty cells
 board = [[[] for index in range(7)] for index in range(7)]
-winning_rows = [0, 0, 0, 0]
-winning_columns = [0, 0, 0, 0]
+winning_rows = [7, 7, 7, 7, 7, 7, 7]
+winning_columns = [7, 7, 7, 7, 7, 7, 7]
 turn = randint(1, 2)
 last_row = 0
 last_column = 0
@@ -129,7 +129,7 @@ def has_four_in_a_row():
                     break
             else:
                 break
-        if in_a_row == 4:
+        if in_a_row >= 4:
             has_four_in_a_row = True
         # Check if there's four-in-a-row vertically
         count = 1
@@ -156,7 +156,7 @@ def has_four_in_a_row():
                     break
             else:
                 break
-        if in_a_row == 4:
+        if in_a_row >= 4:
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (/)
         count = 1
@@ -183,7 +183,7 @@ def has_four_in_a_row():
                     break
             else:
                 break
-        if in_a_row == 4:
+        if in_a_row >= 4:
             has_four_in_a_row = True
         # Check if there's four-in-a-row diagonally (\)
         count = 1
@@ -210,7 +210,7 @@ def has_four_in_a_row():
                     break
             else:
                 break
-        if in_a_row == 4:
+        if in_a_row >= 4:
             has_four_in_a_row = True
     return has_four_in_a_row
 
@@ -219,8 +219,11 @@ def win():
     # Change colors of the winning pieces
     piece = 'x' if turn == 2 else 'o'
     piece = '\033[38;5;118m' + piece + '\033[0m'
-    for i in range(4):
-        board[winning_rows[i]][winning_columns[i]] = piece
+    for i in range(7):
+        if winning_rows[i] < 7 and winning_columns[i] < 7:
+            board[winning_rows[i]][winning_columns[i]] = piece
+        else: # End unnecessary checks
+            break
     # Basically draw_board()
     print()
     print(' ~DING DING DING!~'.format(turn))
