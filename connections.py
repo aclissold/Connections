@@ -3,7 +3,7 @@
 # A simple command-line Connect Four clone.
 #
 # To-do:
-#   Don't show turn info on win
+#   Allow winning of five+ in a row
 #   Colorize winning pieces
 #       green: \033[38;5;46m or 118m normal: \033[0m
 #   Add comments/docstrings
@@ -193,6 +193,9 @@ def has_four_in_a_row():
             if last_row - i >= 0 and last_column + i <= 6:
                 if board[last_row - i][last_column + i] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row - i
+                    winning_columns[count] = last_column + i
+                    count += 1
                 else:
                     break
             else:
@@ -201,6 +204,9 @@ def has_four_in_a_row():
             if last_row + i <= 6 and last_column - i >= 0:
                 if board[last_row + i][last_column - i] == dropped_piece:
                     in_a_row += 1
+                    winning_rows[count] = last_row + i
+                    winning_columns[count] = last_column - i
+                    count += 1
                 else:
                     break
             else:
