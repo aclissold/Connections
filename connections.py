@@ -245,7 +245,8 @@ def win():
         os.system('clear')
     # Change colors of the winning pieces
     piece = 'x' if turn == 2 else 'o'
-    piece = '\033[38;5;118m' + piece + '\033[0m'
+    if not sys.platform == 'win32':
+    	piece = '\033[38;5;118m' + piece + '\033[0m'
     for i in range(len(winning_rows)):
         board[winning_rows[i]][winning_columns[i]] = piece
     print()
