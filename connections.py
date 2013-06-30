@@ -6,11 +6,8 @@
 #   Colorize winning pieces on Windows
 #   Refactor:
 #       Add comments/docstrings
-#       Fix lines >= 79 characters
-#       Consider using loops to draw the board
+#       Split up has_four_in_a_row()
 #       Make classe(s)
-#       Combine functionality of win() and draw_board()
-#       board drawing methods
 #   Create online version
 import os, sys
 from random import randint
@@ -35,17 +32,12 @@ def reset_board():
 # Display the current board state to the user,
 # in a pretty format.
 def draw_board():
-    os.system('clear')
-    print()
-    print(' ~Player {0}\'s Turn~'.format(turn))
     print('   _____________')
-    print('  |' + str(board[6][0]), board[6][1], board[6][2], board[6][3], board[6][4], board[6][5], str(board[6][6]) + '|')
-    print('  |' + str(board[5][0]), board[5][1], board[5][2], board[5][3], board[5][4], board[5][5], str(board[5][6]) + '|')
-    print('  |' + str(board[4][0]), board[4][1], board[4][2], board[4][3], board[4][4], board[4][5], str(board[4][6]) + '|')
-    print('  |' + str(board[3][0]), board[3][1], board[3][2], board[3][3], board[3][4], board[3][5], str(board[3][6]) + '|')
-    print('  |' + str(board[2][0]), board[2][1], board[2][2], board[2][3], board[2][4], board[2][5], str(board[2][6]) + '|')
-    print('  |' + str(board[1][0]), board[1][1], board[1][2], board[1][3], board[1][4], board[1][5], str(board[1][6]) + '|')
-    print('  |' + str(board[0][0]), board[0][1], board[0][2], board[0][3], board[0][4], board[0][5], str(board[0][6]) + '|')
+    for i in reversed(range(7)):
+        print('  |', end='')
+        for j in range(6):
+            print(str(board[i][j]), end=' ')
+        print(str(board[i][6] + '|'))
     print(' /===============\\')
     print('   1 2 3 4 5 6 7')
     print()
@@ -93,6 +85,9 @@ def change_turn():
         turn = 2
     else:
         turn = 1
+    os.system('clear')
+    print()
+    print(' ~Player {0}\'s Turn~'.format(turn))
 
 def top_row_full():
     pieces_in_row = 0
@@ -247,20 +242,9 @@ def win():
     piece = '\033[38;5;118m' + piece + '\033[0m'
     for i in range(len(winning_rows)):
         board[winning_rows[i]][winning_columns[i]] = piece
-    # Basically draw_board()
     print()
     print(' ~DING DING DING!~'.format(turn))
-    print('   _____________')
-    print('  |' + str(board[6][0]), board[6][1], board[6][2], board[6][3], board[6][4], board[6][5], str(board[6][6]) + '|')
-    print('  |' + str(board[5][0]), board[5][1], board[5][2], board[5][3], board[5][4], board[5][5], str(board[5][6]) + '|')
-    print('  |' + str(board[4][0]), board[4][1], board[4][2], board[4][3], board[4][4], board[4][5], str(board[4][6]) + '|')
-    print('  |' + str(board[3][0]), board[3][1], board[3][2], board[3][3], board[3][4], board[3][5], str(board[3][6]) + '|')
-    print('  |' + str(board[2][0]), board[2][1], board[2][2], board[2][3], board[2][4], board[2][5], str(board[2][6]) + '|')
-    print('  |' + str(board[1][0]), board[1][1], board[1][2], board[1][3], board[1][4], board[1][5], str(board[1][6]) + '|')
-    print('  |' + str(board[0][0]), board[0][1], board[0][2], board[0][3], board[0][4], board[0][5], str(board[0][6]) + '|')
-    print(' /===============\\')
-    print('   1 2 3 4 5 6 7')
-    print()
+    draw_board()
     winner = 2 if turn == 1 else 2
     print('Four in a row!!! Player {0} wins!!! ' \
           'Party time.'.format(winner))
@@ -285,6 +269,7 @@ def again():
 # Calls the other functions
 def play():
     reset_board()
+    change_turn()
     draw_board()
     has_four = False
     full = False
