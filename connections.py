@@ -143,7 +143,7 @@ def has_four_in_a_row():
             for i in range(in_a_row - 1):
                 winning_rows.pop()
                 winning_columns.pop()
-            in_a_row = 1
+    in_a_row = 1
     # Check if there's four-in-a-row vertically
     for i in range(1, 5):
         # Bottom to top
@@ -174,7 +174,7 @@ def has_four_in_a_row():
             for i in range(in_a_row - 1):
                 winning_rows.pop()
                 winning_columns.pop()
-            in_a_row = 1
+    in_a_row = 1
     # Check if there's four-in-a-row diagonally (/)
     for i in range(1, 7):
         # Lower-left to upper-right
@@ -205,7 +205,7 @@ def has_four_in_a_row():
             for i in range(in_a_row - 1):
                 winning_rows.pop()
                 winning_columns.pop()
-            in_a_row = 1
+    in_a_row = 1
     # Check if there's four-in-a-row diagonally (\)
     for i in range(1, 7):
         if last_row - i >= 0 and last_column + i <= 6:
@@ -227,13 +227,14 @@ def has_four_in_a_row():
                 break
         else:
             break
-    if len(winning_rows) >= 4:
+    if in_a_row >= 4:
         has_four_in_a_row = True
     else:
         if in_a_row > 1:
             for i in range(in_a_row - 1):
                 winning_rows.pop()
                 winning_columns.pop()
+    if not has_four_in_a_row:
         # Also remove initial piece
         winning_rows.pop()
         winning_columns.pop()
