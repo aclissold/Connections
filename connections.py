@@ -85,7 +85,10 @@ def change_turn():
         turn = 2
     else:
         turn = 1
-    os.system('clear')
+    if sys.platform == 'win32':
+        os.system('cls')
+    else:
+        os.system('clear')
     print()
     print(' ~Player {0}\'s Turn~'.format(turn))
 
@@ -236,7 +239,10 @@ def has_four_in_a_row():
     return has_four_in_a_row
 
 def win():
-    os.system('clear')
+    if sys.platform == 'win32':
+        os.system('cls')
+    else:
+        os.system('clear')
     # Change colors of the winning pieces
     piece = 'x' if turn == 2 else 'o'
     piece = '\033[38;5;118m' + piece + '\033[0m'
