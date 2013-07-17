@@ -9,6 +9,7 @@
 #       Split up has_four_in_a_row()
 #       Make classe(s)
 #   Create online version
+
 import os, sys
 from random import randint
 
@@ -22,6 +23,12 @@ last_column = 0
 
 # Set each board cell to a space
 def reset_board():
+    """Initialize (or reset) the board to a clean slate.
+    
+    Clear all board cells (i.e., set all indices of the board variable to a
+    single space character), and pop any indices off of winning_rows and
+    winning_columns.
+    """
     for i in range(7):
         for j in range(7):
             board[i][j] = ' '
@@ -32,6 +39,12 @@ def reset_board():
 # Display the current board state to the user,
 # in a pretty format.
 def draw_board():
+    """Display the board on the screen.
+
+    Use a nested for-loops to iterated through the elements of board
+    and display them properly in a grid resembling a Connect Four game.
+
+    """
     print('   _____________')
     for i in reversed(range(7)):
         print('  |', end='')
@@ -43,19 +56,24 @@ def draw_board():
     print()
 
 def prompt_column(is_full=False):
+    """Ask the player what column to drop a piece in and return it.
+
+    Also, exit if the player types "q".
+
+    """
     if is_full:
         message = 'Column is full, please choose another: '
     else:
         message = 'Choose a column (or type q to quit): '
     column = -1
     while column < 0 or column > 6:
-        inputed_string = input(message)
-        modified_input = str(inputed_string).lower().split()
+        inputted_string = input(message)
+        modified_input = str(inputted_string).lower().split()
         if modified_input:
             if modified_input[0] == 'q' or modified_input[0] == 'quit':
                 sys.exit(0)
         try:
-            column = int(inputed_string) - 1
+            column = int(inputted_string) - 1
         except ValueError:
             pass
         if column < 0 or column > 6:
@@ -63,6 +81,7 @@ def prompt_column(is_full=False):
     return column
 
 def drop_piece(column):
+    """Drop a game piece in the given column."""
     global last_row, last_column
     for row in range(7):
         if board[row][column] == ' ':
@@ -80,6 +99,7 @@ def drop_piece(column):
         drop_piece(new_column)
 
 def change_turn():
+    """Turn 1 becomes 2 and vice versa; clear the screen; display turn info."""
     global turn
     if turn == 1:
         turn = 2
@@ -93,6 +113,11 @@ def change_turn():
     print(' ~Player {0}\'s Turn~'.format(turn))
 
 def top_row_full():
+    """Determine if the top row is full.
+
+    If it IS full, display a "Draw" message and return True. Else return False.
+
+    """
     pieces_in_row = 0
     for i in range(7):
         if board[6][i] == ' ':
@@ -106,6 +131,11 @@ def top_row_full():
         return False
 
 def has_four_in_a_row():
+    """Check if the previously dropped piece led to four+ in a row.
+
+    Return True if that was the case; False otherwise.
+
+    """
     dropped_piece = board[last_row][last_column]
     has_four_in_a_row = False
     winning_rows.append(last_row)
@@ -258,6 +288,7 @@ def win():
     print()
 
 def again():
+    """Ask the player if they want to play again and respond accordingly."""
     while True:
         choice = str(input('Play again? (Y/n): ').lower().split())
         if len(choice) == 2:
@@ -275,6 +306,7 @@ def again():
 
 # Calls the other functions
 def play():
+    """Call all the functions that make up this program."""
     reset_board()
     change_turn()
     draw_board()
@@ -300,4 +332,3 @@ if __name__ == '__main__':
         play()
     else:
         print('Connections requires Python 3 to run.')
-
