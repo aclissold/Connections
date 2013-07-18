@@ -3,6 +3,7 @@
 # A simple command-line Connect Four clone.
 #
 # To-do:
+#   Change board to by 7 x 6
 #   Colorize winning pieces on Windows
 #   Refactor:
 #       Add comments/docstrings
@@ -10,34 +11,34 @@
 #       Make classe(s)
 #   Create online version
 
-import os, sys
+import os
+import sys
 from random import randint
 
-# Initialize board to empty cells
+# Initialize board to 7 x 7 empty cells
 board = [[[] for index in range(7)] for index in range(7)]
+# Holds the player's turn info (initialized randomly)
+turn = randint(1, 2)
+# Lists to hold indices of in-a-row pieces
 winning_rows = []
 winning_columns = []
-turn = randint(1, 2)
+# Holds the indices of the last-dropped piece
 last_row = 0
 last_column = 0
 
 # Set each board cell to a space
 def reset_board():
-    """Initialize (or reset) the board to a clean slate.
+    """Reset (or initialize) the board to a clean slate."""
     
-    Clear all board cells (i.e., set all indices of the board variable to a
-    single space character), and pop any indices off of winning_rows and
-    winning_columns.
-    """
+    # Clear all board cells by setting each index to a single space character
     for i in range(7):
         for j in range(7):
             board[i][j] = ' '
+    # Pop any winning indices off of winning_rows and winning_columns
     for i in range(len(winning_rows)):
         winning_rows.pop()
         winning_columns.pop()
 
-# Display the current board state to the user,
-# in a pretty format.
 def draw_board():
     """Display the board on the screen.
 
@@ -58,19 +59,25 @@ def draw_board():
 def prompt_column(is_full=False):
     """Ask the player what column to drop a piece in and return it.
 
-    Also, exit if the player types "q".
+    Also, exit if the player types "q". True should be passed to this
+    function if prompt_column was called previously and found to be
+    a full column by drop_piece(). This causes a different prompt
+    message to be displayed.
 
     """
     if is_full:
         message = 'Column is full, please choose another: '
     else:
         message = 'Choose a column (or type q to quit): '
+    # Initialize column to an invalid number
     column = -1
+    # "while column is invalid"
     while column < 0 or column > 6:
         inputted_string = input(message)
         modified_input = str(inputted_string).lower().split()
         if modified_input:
             if modified_input[0] == 'q' or modified_input[0] == 'quit':
+                print('Thanks for playing!')
                 sys.exit(0)
         try:
             column = int(inputted_string) - 1
@@ -83,10 +90,14 @@ def prompt_column(is_full=False):
 def drop_piece(column):
     """Drop a game piece in the given column."""
     global last_row, last_column
+    # Iterate through the board from bottom to top
     for row in range(7):
+        # Skip nonempty cells
         if board[row][column] == ' ':
             if turn == 1:
+                # Drop piece
                 board[row][column] = 'x'
+                # Store these indices for later
                 last_row, last_column = row, column
                 break
             else:
@@ -99,7 +110,7 @@ def drop_piece(column):
         drop_piece(new_column)
 
 def change_turn():
-    """Turn 1 becomes 2 and vice versa; clear the screen; display turn info."""
+    """Set turn 1 to 2 or vice versa; clear the screen; display turn info."""
     global turn
     if turn == 1:
         turn = 2
@@ -119,8 +130,9 @@ def top_row_full():
 
     """
     pieces_in_row = 0
-    for i in range(7):
-        if board[6][i] == ' ':
+    # Count the pieces in the top row
+    for column in range(7):
+        if board[6][column] == ' ':
             break
         else:
             pieces_in_row += 1
@@ -269,16 +281,19 @@ def has_four_in_a_row():
     return has_four_in_a_row
 
 def win():
+    """Clear the screen; make winning pieces green; print winning message."""
+    # Clear the screen
     if sys.platform == 'win32':
         os.system('cls')
     else:
         os.system('clear')
-    # Change colors of the winning pieces
+    # Change colors of the winning pieces (only on Mac/Linux)
     piece = 'x' if turn == 2 else 'o'
     if not sys.platform == 'win32':
     	piece = '\033[38;5;118m' + piece + '\033[0m'
     for i in range(len(winning_rows)):
         board[winning_rows[i]][winning_columns[i]] = piece
+    # Draw the board with a unique winning message above and below
     print()
     print(' ~DING DING DING!~'.format(turn))
     draw_board()
@@ -291,18 +306,21 @@ def again():
     """Ask the player if they want to play again and respond accordingly."""
     while True:
         choice = str(input('Play again? (Y/n): ').lower().split())
+        # Accept no input (which results in '') as a default action
         if len(choice) == 2:
             play()
         else:
+            # Accept any word starting with "y"
             if choice[2] == 'y':
                 play()
+            # Accept any word starting with "n"
             elif choice[2] == 'n':
                 print('Thanks for playing!')
                 print()
                 sys.exit(0)
             else:
-                print('Please type a \"y\" (or hit enter) for yes, ' \
-                      'or an \"n\" for no.')
+                print('Please type a "y" (or hit enter) for yes, ' \
+                      'or an "n" for no.')
 
 # Calls the other functions
 def play():
@@ -310,25 +328,33 @@ def play():
     reset_board()
     change_turn()
     draw_board()
+    # while-loop conditional initialization
     has_four = False
     full = False
     while(not has_four and not full):
+        # Ask the player for a column and save it
         column = prompt_column()
         drop_piece(column)
         change_turn()
+        # Check if the top row is full and save the boolean result
         full = top_row_full()
+        # Check if the last piece resulted in four+ in a row and save the
+        # boolean result
         has_four = has_four_in_a_row()
         if has_four:
-            win()
+            win() # DING DING DING!
         else:
             draw_board()
+    # Ask if the player wants to play again
     again()
 
 if __name__ == '__main__':
+    # print('whatever') looks silly on Python 2.
     req_version = (3,0)
     cur_version = sys.version_info
 
     if cur_version >= req_version:
-        play()
+        play() # Start the game!!!
     else:
         print('Connections requires Python 3 to run.')
+        # (implicit exit)
