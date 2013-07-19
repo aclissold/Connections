@@ -137,7 +137,12 @@ def top_row_full():
         else:
             pieces_in_row += 1
     if pieces_in_row == 7:
-        print('IT\'S A DRAW?!? Nobody wins! Sad day.')
+        if sys.platform == 'win32':
+            os.system('cls')
+        else:
+            os.system('clear')
+        print()
+        print(' IT\'S A DRAW?!? Nobody wins! Sad day.')
         return True
     else:
         return False
@@ -335,9 +340,10 @@ def play():
         # Ask the player for a column and save it
         column = prompt_column()
         drop_piece(column)
-        change_turn()
         # Check if the top row is full and save the boolean result
         full = top_row_full()
+        if not full:
+            change_turn()
         # Check if the last piece resulted in four+ in a row and save the
         # boolean result
         has_four = has_four_in_a_row()
