@@ -29,7 +29,7 @@ class ChatClient(object):
         # try:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, self.port))
-        print('Connected to chat server@%d' % self.port)
+        print('Established connection with server on port {}.'.format(self.port))
         # Send my name...
         send(self.sock, 'NAME: ' + self.name) 
         data = receive(self.sock)
@@ -71,7 +71,7 @@ class ChatClient(object):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        sys.exit('Usage: %s name host port' % sys.argv[0])
+        sys.exit('Usage: {} name host port'.format(sys.argv[0]))
         
     client = ChatClient(sys.argv[1],sys.argv[2], int(sys.argv[3]))
     client.cmdloop()

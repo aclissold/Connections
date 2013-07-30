@@ -58,25 +58,29 @@ class ChatServer(object):
                 if s == self.server:
                     # handle the server socket
                     client, address = self.server.accept()
-                    print('chatserver: got connection %d from %s' %
-                        (client.fileno(), address))
-                    # Read the login name
-                    cname = receive(client).split('NAME: ')[1]
-                    
-                    # Compute client name and send back
-                    self.clients += 1
-                    send(client, 'CLIENT: ' + str(address[0]))
-                    inputs.append(client)
+                    # only allow two clients
+                    if self.clients > 1:
+                        client.close()
+                    else:
+                        print('chatserver: got connection {} from {}'.format(
+                            (client.fileno(), address)))
+                        # Read the login name
+                        cname = receive(client).split('NAME: ')[1]
+                        
+                        # Compute client name and send back
+                        self.clients += 1
+                        send(client, 'CLIENT: ' + str(address[0]))
+                        inputs.append(client)
 
-                    self.clientmap[client] = (address, cname)
-                    # Send joining information to other clients
-                    msg = '\n(Connected: New client (%d) from %s)' % \
-                        (self.clients, self.get_name(client))
-                    for o in self.outputs:
-                        # o.send(msg)
-                        send(o, msg)
-                    
-                    self.outputs.append(client)
+                        self.clientmap[client] = (address, cname)
+                        # Send joining information to other clients
+                        msg = '\n(Connected: New client ({}) from {})'.format(
+                            (self.clients, self.get_name(client)))
+                        for o in self.outputs:
+                            # o.send(msg)
+                            send(o, msg)
+                        
+                        self.outputs.append(client)
 
                 elif s == sys.stdin:
                     # handle standard input
@@ -95,15 +99,15 @@ class ChatServer(object):
                                 if o != s:
                                     send(o, msg)
                         else:
-                            print('chatserver: %d hung up' % s.fileno())
+                            print('chatserver: {} hung up'.format(fileno()))
                             self.clients -= 1
                             s.close()
                             inputs.remove(s)
                             self.outputs.remove(s)
 
                             # Send client leaving information to others
-                            msg = '\n(Hung up: Client from %s)' % \
-                                self.get_name(s)
+                            msg = '\n(Hung up: Client from {})'.format(
+                                self.get_name(s))
                             for o in self.outputs:
                                 send(o, msg)
                                 
