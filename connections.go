@@ -1,11 +1,15 @@
 // A simple command-line Connect Four clone.
 //
 // To-do:
+//     Consider changing "x" to 'x' and using runes
+//     Change var declarations to var()
+//     Research int vs. uint8
+//     Look up correct comment documentation format
 //     Change board to by 7 x 6
 //     Colorize winning pieces on Windows
 //     Refactor:
 //         Add comments/docstrings
-//         Split up has_four_in_a_row()
+//         Split up hasFourInARow()
 //         Make classe(s)
 //     Create online version
 //
@@ -23,7 +27,7 @@ import (
 	"strings"
 )
 
-// Initialize board to 7 x 7 empty cells (sub-cells initialized in init())
+// Will be initialized to 7 x 7 empty cells to hold game pieces
 var board = make([][]string, 7)
 
 // Holds the player's turn info (initialized randomly)
@@ -39,13 +43,17 @@ var lastColumn int
 
 // Reset (or initialize) the board to a clean slate.
 func resetBoard() {
+	board = make([][]string, 7)
+	for i := range board {
+		board[i] = make([]string, 7)
+	}
 	// Clear all board cells by setting each index to a single space character
 	for i := 0; i < 7; i++ {
 		for j := 0; j < 7; j++ {
 			board[i][j] = " "
 		}
 	}
-	// Remove any winning indices from winning_rows and winning_columns
+	// Remove any winning indices from winningRows and winningColumns
 	winningRows = winningRows[:-len(winningRows)]
 	winningColumns = winningColumns[:-len(winningRows)]
 }
@@ -57,10 +65,10 @@ func drawBoard() {
 	   and display them properly in a grid resembling a Connect Four game.
 	*/
 	fmt.Println("   _____________")
-	for i := 7; i > 0; i-- {
+	for i := 6; i > -1; i-- {
 		fmt.Print("  |")
 		for j := 0; j < 6; j++ {
-			fmt.Print(string(board[i][j]))
+			fmt.Print(string(board[i][j]) + " ")
 		}
 		fmt.Println(string(board[i][6] + "|"))
 	}
@@ -89,11 +97,11 @@ func promptColumn(isFull bool) int {
 	column := -1
 	// "while column is invalid"
 	for column < 0 || column > 6 {
-		fmt.Print(message)
+        fmt.Print(message)
 		scanner.Scan()
 		choice := scanner.Text()
 		if err := scanner.Err(); err != nil {
-			fmt.Fprintln(os.Stderr, "reading standard input:", err)
+			log.Fatal("reading standard input:", err)
 		}
 		choice = strings.Trim(choice, " ")
 		choice = strings.ToLower(choice)
@@ -101,13 +109,15 @@ func promptColumn(isFull bool) int {
 			fmt.Println("Thanks for playing!")
 			os.Exit(0)
 		}
-		for column := 1; column < 0 || column > 6; {
+		for column < 0 || column > 6 {
+            // XXX Why won't it escape this loop?
 			column, err := strconv.Atoi(choice)
 			column -= 1
 			if err != nil {
 				log.Fatal(err)
 			} else if column < 0 || column > 6 {
 				fmt.Println("Please enter a number from 1 - 7 or \"q\".")
+                break
 			}
 		}
 	}
@@ -153,12 +163,12 @@ func changeTurn() {
 	// XXX
 	clear()
 	fmt.Println()
-	fmt.Printf(" ~Player %d's Turn~", turn)
+	fmt.Printf(" ~Player %d's Turn~\n", turn)
 }
 
 // Clear the screen in preparation to redraw the board
 func clear() {
-    var cmd *exec.Cmd
+	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("cls")
 	} else {
@@ -171,41 +181,40 @@ func clear() {
 	}
 }
 
-// func top_row_full() {
-//     """Determine if the top row is full.
-//
-//     If it IS full, display a "Draw" message and return true. Else return false.
-//
-//     """
-//     pieces_in_row = 0
-//     // Count the pieces in the top row
-//     for column in range(7):
-//         if board[6][column] == " ":
-//             break
-//         else:
-//             pieces_in_row += 1
-//     if pieces_in_row == 7:
-//         if sys.platform == "win32":
-//             os.system("cls")
-//         else:
-//             os.system("clear")
-//         fmt.Println()
-//         fmt.Println(" IT\'S A DRAW?!? Nobody wins! Sad day.")
-//         return true
-//     else:
-//         return false
-// }
+// Determine if the top row is full, and display "Draw" if returning true.
+func topRowFull() bool {
+	piecesInRow := 0
+	// Count the pieces in the top row
+	for column := 0; column < 7; column++ {
+		if board[6][column] == " " {
+			break
+		} else {
+			piecesInRow++
+		}
+	}
+	if piecesInRow == 7 {
+		clear()
+		fmt.Println()
+		fmt.Println(" IT'S A DRAW?!? Nobody wins! Sad day.")
+		return true
+	}
+	return false
+}
 
-// func has_four_in_a_row() {
+func hasFourInARow() bool {
+	return false
+}
+
+// func hasFourInARow() {
 //     """Check if the previously dropped piece led to four+ in a row.
 //
 //     Return true if that was the case; false otherwise.
 //
 //     """
 //     dropped_piece = board[lastRow][lastColumn]
-//     has_four_in_a_row = false
-//     winning_rows.append(lastRow)
-//     winning_columns.append(lastColumn)
+//     hasFourInARow = false
+//     winningRows.append(lastRow)
+//     winningColumns.append(lastColumn)
 //     in_a_row = 1
 //     // Check if there's four-in-a-row horizontally
 //     for i in range(1, 7):
@@ -213,8 +222,8 @@ func clear() {
 //         if lastColumn - i >= 0:
 //             if board[lastRow][lastColumn - i] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow)
-//                 winning_columns.append(lastColumn - i)
+//                 winningRows.append(lastRow)
+//                 winningColumns.append(lastColumn - i)
 //             else:
 //                 break
 //         else:
@@ -224,19 +233,19 @@ func clear() {
 //         if lastColumn + i <= 6:
 //             if board[lastRow][lastColumn + i] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow)
-//                 winning_columns.append(lastColumn + i)
+//                 winningRows.append(lastRow)
+//                 winningColumns.append(lastColumn + i)
 //             else:
 //                 break
 //         else:
 //             break
 //     if in_a_row >= 4:
-//         has_four_in_a_row = true
+//         hasFourInARow = true
 //     else:
 //         if in_a_row > 1:
 //             for i in range(in_a_row - 1):
-//                 winning_rows.pop()
-//                 winning_columns.pop()
+//                 winningRows.pop()
+//                 winningColumns.pop()
 //     in_a_row = 1
 //     // Check if there's four-in-a-row vertically
 //     for i in range(1, 5):
@@ -244,8 +253,8 @@ func clear() {
 //         if lastRow + i <= 6:
 //             if board[lastRow + i][lastColumn] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow + i)
-//                 winning_columns.append(lastColumn)
+//                 winningRows.append(lastRow + i)
+//                 winningColumns.append(lastColumn)
 //             else:
 //                 break
 //         else:
@@ -255,19 +264,19 @@ func clear() {
 //         if lastRow - i >= 0:
 //             if board[lastRow - i][lastColumn] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow - i)
-//                 winning_columns.append(lastColumn)
+//                 winningRows.append(lastRow - i)
+//                 winningColumns.append(lastColumn)
 //             else:
 //                 break
 //         else:
 //             break
 //     if in_a_row >= 4:
-//         has_four_in_a_row = true
+//         hasFourInARow = true
 //     else:
 //         if in_a_row > 1:
 //             for i in range(in_a_row - 1):
-//                 winning_rows.pop()
-//                 winning_columns.pop()
+//                 winningRows.pop()
+//                 winningColumns.pop()
 //     in_a_row = 1
 //     // Check if there's four-in-a-row diagonally (/)
 //     for i in range(1, 7):
@@ -275,8 +284,8 @@ func clear() {
 //         if lastRow + i <= 6 and lastColumn + i <= 6:
 //             if board[lastRow + i][lastColumn + i] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow + i)
-//                 winning_columns.append(lastColumn + i)
+//                 winningRows.append(lastRow + i)
+//                 winningColumns.append(lastColumn + i)
 //             else:
 //                 break
 //         else:
@@ -286,27 +295,27 @@ func clear() {
 //         if lastRow - i >= 0 and lastColumn - i >= 0:
 //             if board[lastRow - i][lastColumn - i] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow - i)
-//                 winning_columns.append(lastColumn - i)
+//                 winningRows.append(lastRow - i)
+//                 winningColumns.append(lastColumn - i)
 //             else:
 //                 break
 //         else:
 //             break
 //     if in_a_row >= 4:
-//         has_four_in_a_row = true
+//         hasFourInARow = true
 //     else:
 //         if in_a_row > 1:
 //             for i in range(in_a_row - 1):
-//                 winning_rows.pop()
-//                 winning_columns.pop()
+//                 winningRows.pop()
+//                 winningColumns.pop()
 //     in_a_row = 1
 //     // Check if there's four-in-a-row diagonally (\)
 //     for i in range(1, 7):
 //         if lastRow - i >= 0 and lastColumn + i <= 6:
 //             if board[lastRow - i][lastColumn + i] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow - i)
-//                 winning_columns.append(lastColumn + i)
+//                 winningRows.append(lastRow - i)
+//                 winningColumns.append(lastColumn + i)
 //             else:
 //                 break
 //         else:
@@ -315,104 +324,120 @@ func clear() {
 //         if lastRow + i <= 6 and lastColumn - i >= 0:
 //             if board[lastRow + i][lastColumn - i] == dropped_piece:
 //                 in_a_row += 1
-//                 winning_rows.append(lastRow + i)
-//                 winning_columns.append(lastColumn - i)
+//                 winningRows.append(lastRow + i)
+//                 winningColumns.append(lastColumn - i)
 //             else:
 //                 break
 //         else:
 //             break
 //     if in_a_row >= 4:
-//         has_four_in_a_row = true
+//         hasFourInARow = true
 //     else:
 //         if in_a_row > 1:
 //             for i in range(in_a_row - 1):
-//                 winning_rows.pop()
-//                 winning_columns.pop()
-//     if not has_four_in_a_row:
+//                 winningRows.pop()
+//                 winningColumns.pop()
+//     if not hasFourInARow:
 //         // Also remove initial piece
-//         winning_rows.pop()
-//         winning_columns.pop()
-//     return has_four_in_a_row
+//         winningRows.pop()
+//         winningColumns.pop()
+//     return hasFourInARow
 // }
 
-// func win() {
-//     """Clear the screen; make winning pieces green; print winning message."""
-//     // Clear the screen
-//     if sys.platform == 'win32':
-//         os.system('cls')
-//     else:
-//         os.system('clear')
-//     // Change colors of the winning pieces (only on Mac/Linux)
-//     piece = 'x' if turn == 2 else 'o'
-//     if not sys.platform == 'win32':
-//         piece = '\033[38;5;118m' + piece + '\033[0m'
-//     for i in range(len(winning_rows)):
-//         board[winning_rows[i]][winning_columns[i]] = piece
-//     // Draw the board with a unique winning message above and below
-//     fmt.Println()
-//     fmt.Println(' ~DING DING DING!~'.format(turn))
-//     drawBoard()
-//     winner = 2 if turn == 1 else 2
-//     fmt.Println('Four in a row!!! Player {0} wins!!! ' \
-//           'Party time.'.format(winner))
-//     fmt.Println()
-// }
-
-// func again() {
-//     """Ask the player if they want to play again and respond accordingly."""
-//     while true:
-//         choice = str(input('Play again? (Y/n): ').lower().split())
-//         // Accept no input (which results in '') as a default action
-//         if len(choice) == 2:
-//             play()
-//         else:
-//             // Accept any word starting with "y"
-//             if choice[2] == 'y':
-//                 play()
-//             // Accept any word starting with "n"
-//             elif choice[2] == 'n':
-//                 fmt.Println('Thanks for playing!')
-//                 fmt.Println()
-//                 sys.exit(0)
-//             else:
-//                 fmt.Println('Please type a "y" (or hit enter) for yes, ' \
-//                       'or an "n" for no.')
-// }
-
-// // Calls the other functions
-// func play() {
-//     """Call all the functions that make up this program."""
-//     reset_board()
-//     changeTurn()
-//     drawBoard()
-//     // while-loop conditional initialization
-//     has_four = false
-//     full = false
-//     while(not has_four and not full):
-//         // Ask the player for a column and save it
-//         column = promptColumn(false)
-//         dropPiece(column)
-//         // Check if the top row is full and save the boolean result
-//         full = top_row_full()
-//         if not full:
-//             changeTurn()
-//         // Check if the last piece resulted in four+ in a row and save the
-//         // boolean result
-//         has_four = has_four_in_a_row()
-//         if has_four:
-//             win() // DING DING DING!
-//         else:
-//             drawBoard()
-//     // Ask if the player wants to play again
-//     again()
-// }
-
-func main() {
-	// play() // Start the game!!!
+// Clear the screen, make winning pieces green, and print winning message.
+func win() {
+	var piece string
+	var winner int
+	// Clear the screen
+	clear()
+	// Change colors of the winning pieces (only on Mac/Linux)
+	if turn == 2 {
+		piece = "x"
+	} else {
+		piece = "o"
+	}
+	if runtime.GOOS != "windows" {
+		piece = "\033[38;5;118m" + piece + "\033[0m"
+	}
+	for i := 0; i < len(winningRows); i++ {
+		board[winningRows[i]][winningColumns[i]] = piece
+	}
+	// Draw the board with a unique winning message above and below
+	fmt.Println()
+	fmt.Println(" ~DING DING DING!~")
+	drawBoard()
+	if turn == 1 {
+		winner = 1
+	} else {
+		winner = 2
+	}
+	fmt.Printf("Four in a row!!! Player %d wins!!! "+
+		"Party time.\n", winner)
+	fmt.Println()
 }
 
-func init() {
-	for i := range board {
-		board[i] = make([]string, 7)
+// Ask the player if they want to play again and respond accordingly.
+func again() {
+	scanner := bufio.NewScanner(os.Stdin)
+	var choice string
+	for {
+		scanner.Scan()
+		choice = scanner.Text()
+		choice = strings.ToLower(choice)
+		choice = strings.Trim(choice, " ")
+		if err := scanner.Err(); err != nil {
+			log.Fatal("reading standard input:", err)
+		}
+		// Accept no input as a default action
+		if len(choice) == 0 {
+			play()
+		} else {
+			// Accept any word starting with "y"
+			if string(choice[2]) == "y" {
+				play()
+			} else if string(choice[2]) == "n" {
+				// Accept any word starting with "n"
+				fmt.Println("Thanks for playing!")
+				fmt.Println()
+				os.Exit(0)
+			} else {
+				fmt.Println("Please type a \"y\" (or hit enter) for yes, " +
+					"or an \"n\" for no.")
+			}
+		}
 	}
+}
+
+// Call all the functions that make up Connections.
+func play() {
+	resetBoard()
+	changeTurn()
+	drawBoard()
+	// while-loop conditional initialization
+	hasFour := false
+	full := false
+	for !hasFour && !full {
+		// Ask the player for a column and save it
+		column := promptColumn(false)
+		dropPiece(column)
+		// Check if the top row is full and save the boolean result
+		full := topRowFull()
+		if !full {
+			changeTurn()
+		}
+		// Check if the last piece resulted in four+ in a row and save the
+		// boolean result
+		hasFour := hasFourInARow()
+		if hasFour {
+			win() // DING DING DING!
+		} else {
+			drawBoard()
+		}
+	}
+	// Ask if the player wants to play again
+	again()
+}
+
+func main() {
+	play() // Start the game!!!
 }
