@@ -25,13 +25,15 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Will be initialized to 7 x 7 empty cells to hold game pieces
-var board = make([][]string, 7)
+var board [][]string
 
 // Holds the player's turn info (initialized randomly)
-var turn = rand.Intn(2) + 1
+var r *rand.Rand
+var turn uint8
 
 // Slices to hold indices of in-a-row pieces
 var winningRows = make([]int, 0, 7)
@@ -41,12 +43,49 @@ var winningColumns = make([]int, 0, 7)
 var lastRow int
 var lastColumn int
 
-// Reset (or initialize) the board to a clean slate.
-func resetBoard() {
+func main() {
+    // Init
 	board = make([][]string, 7)
 	for i := range board {
 		board[i] = make([]string, 7)
 	}
+    r = rand.New(rand.NewSource(time.Now().UnixNano()))
+    turn = uint8(r.Intn(2)) + 1
+	play() // Start the game!!!
+}
+
+// Call all the functions that make up Connections.
+func play() {
+	resetBoard()
+	changeTurn()
+	drawBoard()
+	// while-loop conditions
+	hasFour := false
+	full := false
+	for !hasFour && !full {
+		// Ask the player for a column and save it
+		column := promptColumn(false)
+		dropPiece(column)
+		// Check if the top row is full and save the boolean result
+		full = topRowFull()
+		if !full {
+			changeTurn()
+		}
+		// Check if the last piece resulted in four+ in a row and save the
+		// boolean result
+		hasFour = hasFourInARow()
+		if hasFour {
+			win() // DING DING DING!
+		} else {
+			drawBoard()
+		}
+	}
+	// Ask if the player wants to play again
+	again()
+}
+
+// Reset (or initialize) the board to a clean slate.
+func resetBoard() {
 	// Clear all board cells by setting each index to a single space character
 	for i := 0; i < 7; i++ {
 		for j := 0; j < 7; j++ {
@@ -97,7 +136,7 @@ func promptColumn(isFull bool) int {
 	column := -1
 	// "while column is invalid"
 	for column < 0 || column > 6 {
-        fmt.Print(message)
+		fmt.Print(message)
 		scanner.Scan()
 		choice := scanner.Text()
 		if err := scanner.Err(); err != nil {
@@ -105,17 +144,18 @@ func promptColumn(isFull bool) int {
 		}
 		choice = strings.Trim(choice, " ")
 		choice = strings.ToLower(choice)
-		if string(choice[0]) == "q" {
-			fmt.Println("Thanks for playing!")
-			os.Exit(0)
-		}
+        if len(choice) > 0 {
+            if string(choice[0]) == "q" {
+                fmt.Println("Thanks for playing!")
+                os.Exit(0)
+            }
+        }
 		for column < 0 || column > 6 {
-            // XXX Why won't it escape this loop?
-			column, err := strconv.Atoi(choice)
+			// column, err := strconv.Atoi(choice) would create a new "column"
+			var err error
+            column, err = strconv.Atoi(choice)
 			column -= 1
-			if err != nil {
-				log.Fatal(err)
-			} else if column < 0 || column > 6 {
+			if err != nil || column < 0 || column > 6 {
 				fmt.Println("Please enter a number from 1 - 7 or \"q\".")
                 break
 			}
@@ -126,7 +166,6 @@ func promptColumn(isFull bool) int {
 
 // Drop a game piece in the given column.
 func dropPiece(column int) {
-	var isFull bool
 	// Iterate through the board from bottom to top
 	for row := 0; row < 7; row++ {
 		// Skip non-empty cells
@@ -136,21 +175,17 @@ func dropPiece(column int) {
 				board[row][column] = "x"
 				// Store these indices for later
 				lastRow, lastColumn = row, column
-				isFull = true
-				break
+				return
 			} else {
 				board[row][column] = "o"
 				lastRow, lastColumn = row, column
-				isFull = true
-				break
+				return
 			}
 		}
 	}
-	if isFull {
-		// Column is full
-		newColumn := promptColumn(true)
-		dropPiece(newColumn)
-	}
+	// Column is full; did not return yet
+	newColumn := promptColumn(true)
+	dropPiece(newColumn)
 }
 
 // Set turn 1 to 2 or vice versa, clear the screen, and display turn info.
@@ -202,7 +237,7 @@ func topRowFull() bool {
 }
 
 func hasFourInARow() bool {
-	return false
+	return true
 }
 
 // func hasFourInARow() {
@@ -380,6 +415,7 @@ func win() {
 func again() {
 	scanner := bufio.NewScanner(os.Stdin)
 	var choice string
+    fmt.Print("Play again? (Y/n): ")
 	for {
 		scanner.Scan()
 		choice = scanner.Text()
@@ -393,9 +429,9 @@ func again() {
 			play()
 		} else {
 			// Accept any word starting with "y"
-			if string(choice[2]) == "y" {
+			if string(choice[0]) == "y" {
 				play()
-			} else if string(choice[2]) == "n" {
+			} else if string(choice[0]) == "n" {
 				// Accept any word starting with "n"
 				fmt.Println("Thanks for playing!")
 				fmt.Println()
@@ -406,38 +442,4 @@ func again() {
 			}
 		}
 	}
-}
-
-// Call all the functions that make up Connections.
-func play() {
-	resetBoard()
-	changeTurn()
-	drawBoard()
-	// while-loop conditional initialization
-	hasFour := false
-	full := false
-	for !hasFour && !full {
-		// Ask the player for a column and save it
-		column := promptColumn(false)
-		dropPiece(column)
-		// Check if the top row is full and save the boolean result
-		full := topRowFull()
-		if !full {
-			changeTurn()
-		}
-		// Check if the last piece resulted in four+ in a row and save the
-		// boolean result
-		hasFour := hasFourInARow()
-		if hasFour {
-			win() // DING DING DING!
-		} else {
-			drawBoard()
-		}
-	}
-	// Ask if the player wants to play again
-	again()
-}
-
-func main() {
-	play() // Start the game!!!
 }
