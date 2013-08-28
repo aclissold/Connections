@@ -22,6 +22,7 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -147,6 +148,7 @@ func promptColumn(isFull bool) int {
         if len(choice) > 0 {
             if string(choice[0]) == "q" {
                 fmt.Println("Thanks for playing!")
+                fmt.Println()
                 os.Exit(0)
             }
         }
@@ -237,7 +239,80 @@ func topRowFull() bool {
 }
 
 func hasFourInARow() bool {
-	return true
+
+    // psuedoBoard is a string representation of a row, column or diagonal of the
+    // pieces on the board which can then be checked for four+ in a row via regexp.
+    var psuedoBoard string
+
+    // hasFourHelper simply holds the code that would be written four times otherwise
+    hasFourHelper := func(psuedoBoard string) bool {
+        hasFour, err := regexp.MatchString("xxxx.*|oooo.*", psuedoBoard)
+        if err != nil {
+            fmt.Fprintln(os.Stderr, err)
+            os.Exit(1)
+        }
+        return hasFour
+    }
+
+    // Check for four+ in a row horizontally
+    for i := 0; i < 7; i++ {
+        psuedoBoard = ""
+        for j := 0; j < 7; j++ {
+            psuedoBoard += board[i][j]
+        }
+        hasFour := hasFourHelper(psuedoBoard)
+        if hasFour {
+            return true
+        }
+    }
+
+    // Check for four+ in a row vertically
+    for i := 0; i < 7; i++ {
+        psuedoBoard = ""
+        for j := 0; j < 7; j++ {
+            psuedoBoard += board[j][i]
+        }
+        hasFour := hasFourHelper(psuedoBoard)
+        if hasFour {
+            return true
+        }
+    }
+/*
+    // Check for four+ in a row diagonally (/)
+    for i := 0; i < 7; i++ {
+        psuedoBoard = ""
+        for j := 0; j < 7; j++ {
+            psuedoBoard += board[i][j]
+        }
+        hasFour, err := regexp.MatchString("xxxx.*|oooo.*", psuedoBoard)
+        if err != nil {
+            fmt.Fprintln(os.Stderr, err)
+            os.Exit(1)
+        }
+        if hasFour {
+            return true
+        }
+    }
+
+    // Check for four+ in a row diagonally (\)
+    for i := 0; i < 7; i++ {
+        psuedoBoard = ""
+        for j := 0; j < 7; j++ {
+            psuedoBoard += board[i][j]
+        }
+        hasFour, err := regexp.MatchString("xxxx.*|oooo.*", psuedoBoard)
+        if err != nil {
+            fmt.Fprintln(os.Stderr, err)
+            os.Exit(1)
+        }
+        if hasFour {
+            return true
+        }
+    }
+*/
+
+    // Never found a match
+	return false
 }
 
 // func hasFourInARow() {
@@ -246,16 +321,17 @@ func hasFourInARow() bool {
 //     Return true if that was the case; false otherwise.
 //
 //     """
-//     dropped_piece = board[lastRow][lastColumn]
+//     droppedPiece = board[lastRow][lastColumn]
 //     hasFourInARow = false
 //     winningRows.append(lastRow)
 //     winningColumns.append(lastColumn)
 //     in_a_row = 1
+
 //     // Check if there's four-in-a-row horizontally
 //     for i in range(1, 7):
 //         // Right to left
 //         if lastColumn - i >= 0:
-//             if board[lastRow][lastColumn - i] == dropped_piece:
+//             if board[lastRow][lastColumn - i] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow)
 //                 winningColumns.append(lastColumn - i)
@@ -266,7 +342,7 @@ func hasFourInARow() bool {
 //     for i in range(1, 7):
 //         // Left to right
 //         if lastColumn + i <= 6:
-//             if board[lastRow][lastColumn + i] == dropped_piece:
+//             if board[lastRow][lastColumn + i] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow)
 //                 winningColumns.append(lastColumn + i)
@@ -282,11 +358,12 @@ func hasFourInARow() bool {
 //                 winningRows.pop()
 //                 winningColumns.pop()
 //     in_a_row = 1
+
 //     // Check if there's four-in-a-row vertically
 //     for i in range(1, 5):
 //         // Bottom to top
 //         if lastRow + i <= 6:
-//             if board[lastRow + i][lastColumn] == dropped_piece:
+//             if board[lastRow + i][lastColumn] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow + i)
 //                 winningColumns.append(lastColumn)
@@ -297,7 +374,7 @@ func hasFourInARow() bool {
 //     for i in range(1, 5):
 //         // Top to bottom
 //         if lastRow - i >= 0:
-//             if board[lastRow - i][lastColumn] == dropped_piece:
+//             if board[lastRow - i][lastColumn] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow - i)
 //                 winningColumns.append(lastColumn)
@@ -317,7 +394,7 @@ func hasFourInARow() bool {
 //     for i in range(1, 7):
 //         // Lower-left to upper-right
 //         if lastRow + i <= 6 and lastColumn + i <= 6:
-//             if board[lastRow + i][lastColumn + i] == dropped_piece:
+//             if board[lastRow + i][lastColumn + i] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow + i)
 //                 winningColumns.append(lastColumn + i)
@@ -328,7 +405,7 @@ func hasFourInARow() bool {
 //     for i in range(1, 7):
 //         // Upper-right to lower-left
 //         if lastRow - i >= 0 and lastColumn - i >= 0:
-//             if board[lastRow - i][lastColumn - i] == dropped_piece:
+//             if board[lastRow - i][lastColumn - i] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow - i)
 //                 winningColumns.append(lastColumn - i)
@@ -347,7 +424,7 @@ func hasFourInARow() bool {
 //     // Check if there's four-in-a-row diagonally (\)
 //     for i in range(1, 7):
 //         if lastRow - i >= 0 and lastColumn + i <= 6:
-//             if board[lastRow - i][lastColumn + i] == dropped_piece:
+//             if board[lastRow - i][lastColumn + i] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow - i)
 //                 winningColumns.append(lastColumn + i)
@@ -357,7 +434,7 @@ func hasFourInARow() bool {
 //             break
 //     for i in range(1, 7):
 //         if lastRow + i <= 6 and lastColumn - i >= 0:
-//             if board[lastRow + i][lastColumn - i] == dropped_piece:
+//             if board[lastRow + i][lastColumn - i] == droppedPiece:
 //                 in_a_row += 1
 //                 winningRows.append(lastRow + i)
 //                 winningColumns.append(lastColumn - i)
